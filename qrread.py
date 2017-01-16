@@ -1,8 +1,7 @@
 from tkinter import *
 import clipboard
 import sqlite3
-
-
+from playsound import playsound
 class App:
     def __init__(self, master, dbname):
         frame = Frame(master)
@@ -18,25 +17,31 @@ class App:
     def validate(self):
         uniqueID = clipboard.paste()
         print uniqueID
-        if (self.inDatabase(uniqueID)):
-            print "Found %s" %uniqueID
+        res = self.inDatabase(uniqueID)
+        if (res["error"]):
+            print res["msg"]
+            playsound("sounds/no.mp3")
         else:
-            print "Not Found!"
+            print res["msg"]
+            playsound("sounds/hello.mp3")
 
     def inDatabase(self, ID):
         conn = sqlite3.connect(self.dbname)
         c = conn.cursor()
-        c.execute('SELECT * FROM attendees WHERE id=?', ID)
+        c.execute('SELECT * FROM attendees WHERE id=(?)', (ID,))
         res = c.fetchone()
+        print res
         if (res is None):
             conn.close()
-            return False
+            return {"error" : True, "msg" : "Not in database"}
+        elif (res[3] == 1):
+            return {"error" : True, "msg" : "Already checked in"}
         else:
             c.execute('UPDATE attendees SET checkedin=1 WHERE id=?', ID)
             conn.commit()
             conn.close()
-            return True
-        return False
+            return {"error" : False, "msg" : "Welcome"}
+        return {"error" : True, "msg" : "None"}
 
 
 if __name__ == "__main__":
