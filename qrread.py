@@ -2,6 +2,7 @@ from tkinter import *
 import clipboard
 import sqlite3
 from playsound import playsound
+
 class App:
     def __init__(self, master, dbname):
         frame = Frame(master)
@@ -37,7 +38,7 @@ class App:
         elif (res[3] == 1):
             return {"error" : True, "msg" : "Already checked in"}
         else:
-            c.execute('UPDATE attendees SET checkedin=1 WHERE id=?', ID)
+            c.execute('UPDATE attendees SET checkedin=1 WHERE id=(?)', (ID,))
             conn.commit()
             conn.close()
             return {"error" : False, "msg" : "Welcome"}
