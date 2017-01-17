@@ -15,8 +15,18 @@ class QRCodeCreator(object):
         return id
 
     def createQR(self, id):
-        self.makeQR(self.createContents(id), 6, str(id)+".png")
+        self.makeQR(self.createContents(id), 6, "qr/" + str(id)+".png")
+
+    # File with just id number in each line
+    def createQRFromFile(self, filename):
+        with open(filename, 'r') as f:
+            text = f.readlines()
+            for line in text:
+                entry = int(line.rstrip())
+                self.createQR(entry)
+
 
 if __name__ == "__main__":
     qr = QRCodeCreator()
-    qr.createQR(2)
+    qr.createQR(462)
+    qr.createQR(124)

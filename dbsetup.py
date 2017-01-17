@@ -10,13 +10,13 @@ class DBCreator(object):
         c = conn.cursor()
         c.execute('''DROP TABLE attendees''');
         c.execute('''CREATE TABLE attendees
-             (id integer, fname text, lname text, checkedin integer)''')
+             (id integer, fname text, lname text, waiver integer, checkedin integer)''')
         with open(filename, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 entry = line.rstrip().split(" ")
                 print entry
-                c.execute("INSERT INTO attendees VALUES (?, ?, ?, 0)", (entry[0], entry[1], entry[2]))
+                c.execute("INSERT INTO attendees VALUES (?, ?, ?, ?, 0)", (entry[0], entry[1], entry[2], int(entry[3])))
         conn.commit()
         conn.close()
 
