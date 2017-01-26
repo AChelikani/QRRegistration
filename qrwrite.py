@@ -28,5 +28,4 @@ class QRCodeCreator(object):
 
 if __name__ == "__main__":
     qr = QRCodeCreator()
-    qr.createQR(462)
-    qr.createQR(124)
+    qr.createQR(1)

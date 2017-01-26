@@ -19,6 +19,9 @@ class App:
         self.manual = Button(frame, text="Manual", command=self.manual)
         self.manual.pack(side=LEFT)
 
+        self.addWaiver = Button(frame, text="Add Waiver", command=self.addWaiver)
+        self.addWaiver.pack(side=LEFT)
+
         self.dbname = dbname
 
     def validateID(self, id):
@@ -47,16 +50,43 @@ class App:
         if (res is None):
             conn.close()
             return {"error" : True, "msg" : "Not in database"}
-        elif (res[4] == 1):
+        elif (res[5] == 1):
+            conn.close()
             return {"error" : True, "msg" : "Already checked in"}
-        elif (res[3] == 0):
+        elif (res[4] == 0):
+            conn.close()
             return {"error" : True, "msg" : "Waiver not completed"}
         else:
             c.execute('UPDATE attendees SET checkedin=1 WHERE id=(?)', (ID,))
             conn.commit()
             conn.close()
             return {"error" : False, "msg" : "Welcome" + res[1] + res[2]}
+        conn.close()
         return {"error" : True, "msg" : "None"}
+
+    def markWaiverAndCheckin(self, ID):
+        conn = sqlite3.connect(self.dbname)
+        c = conn.cursor()
+        c.execute('SELECT * FROM attendees WHERE id=(?)', (ID,))
+        res = c.fetchone()
+        if (res is None):
+            conn.close()
+            return {"error" : True, "msg" : "Not in database"}
+        elif (res[5] == 1):
+            conn.close()
+            return {"error" : True, "msg" : "Already checked in"}
+        else:
+            c.execute('UPDATE attendees SET checkedin=1 AND waiver=1 WHERE id=(?)', (ID,))
+            conn.commit()
+            conn.close()
+            return {"error" : False, "msg" : "Welcome" + res[1] + res[2]}
+        conn.close()
+        return {"error" : True, "msg" : "None"}
+
+    def addWaiver(self):
+        text = self.manualText.get()
+        if (text):
+            self.markWaiverAndCheckin(int(text))
 
 
 if __name__ == "__main__":
